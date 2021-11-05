@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR BSD-3-Clause
 
-use std::convert::{TryFrom, TryInto};
+use std::convert::TryFrom;
 use std::error;
 use std::ffi::{CStr, CString};
 use std::fmt;
@@ -192,11 +192,7 @@ pub fn update(updates: Vec<CUpdate>) -> Result<()> {
     for u in updates {
         // Safe because this doesn't modify any local memory.
         let ret = unsafe {
-            bindings::capng_update(
-                u.action as u32,
-                u.cap_type.bits() as u32,
-                u.capability.try_into().unwrap(),
-            )
+            bindings::capng_update(u.action as u32, u.cap_type.bits() as u32, u.capability)
         };
         if ret < 0 {
             return Err(Error::UpdateCapability(u.capability));
