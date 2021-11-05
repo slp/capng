@@ -110,6 +110,7 @@ bitflags! {
     }
 }
 
+#[derive(Copy, Clone)]
 pub enum Action {
     DROP = 0,
     ADD = 1,
@@ -199,6 +200,19 @@ pub fn update(updates: Vec<CUpdate>) -> Result<()> {
         };
         if ret < 0 {
             return Err(Error::UpdateCapability(u.capability));
+        }
+    }
+
+    Ok(())
+}
+
+pub fn updatev(action: Action, _type: Type, names: Vec<&str>) -> Result<()> {
+    for name in names {
+        let cap = name_to_capability(name)?;
+        // Safe because this doesn't modify any local memory.
+        let ret = unsafe { bindings::capng_update(action as u32, _type.bits() as u32, cap) };
+        if ret < 0 {
+            return Err(Error::UpdateCapability(cap));
         }
     }
 
