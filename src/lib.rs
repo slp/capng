@@ -7,6 +7,7 @@ use std::error;
 use std::ffi::{CStr, CString};
 use std::fmt;
 use std::fs::File;
+use std::os::raw::c_char;
 use std::os::unix::io::AsRawFd;
 
 #[macro_use]
@@ -336,7 +337,7 @@ pub fn name_to_capability(name: &str) -> Result<Capability> {
 
     // Safe because this doesn't modify any local memory and we have converted
     // name to a CString.
-    let cap_id: i32 = unsafe { bindings::capng_name_to_capability(cstr.as_ptr() as *const i8) };
+    let cap_id: i32 = unsafe { bindings::capng_name_to_capability(cstr.as_ptr() as *const c_char) };
     if cap_id < 0 {
         return Err(Error::GetCapabilityId(name.to_string()));
     }
